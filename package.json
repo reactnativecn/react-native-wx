@@ -1,0 +1,32 @@
+{
+  "name": "react-native-wx",
+  "version": "1.0.0",
+  "description": "微信登录、分享、支付模块",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lvbingru/react-native-wx.git"
+  },
+  "keywords": [
+    "react-native",
+    "ios",
+    "android",
+    "wechat",
+    "weixin",
+    "login",
+    "share",
+    "pay"
+  ],
+  "author": "lvbingru",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lvbingru/react-native-wx/issues"
+  },
+  "homepage": "https://github.com/lvbingru/react-native-wx#readme",
+  "dependencies": {
+    "es6-promisify": "^3.0.0"
+  }
+}
