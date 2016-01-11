@@ -173,7 +173,7 @@ data : {
 
 ## 常见问题
 
-#### Android: 调用WeiboAPI.login()没有反应
+#### Android: 调用WechatAPI.login()没有反应
 
 通常出现这个原因是因为Manifest没有配置好，检查Manifest中有关Activity的配置。
 
