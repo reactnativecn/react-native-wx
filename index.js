@@ -81,12 +81,12 @@ export function login(config) {
       .then(() => waitForResponse("SendAuth.Resp"));
 }
 
-export function shareToTimelineRequest(data) {
+export function shareToTimeline(data) {
   return nativeShareToTimelineRequest(data)
       .then(() => waitForResponse("SendMessageToWX.Resp"));
 }
 
-export function shareToSessionRequest(data) {
+export function shareToSession(data) {
   return nativeShareToSessionRequest(data)
       .then(() => waitForResponse("SendMessageToWX.Resp"));
 }

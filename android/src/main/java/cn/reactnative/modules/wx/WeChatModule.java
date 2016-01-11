@@ -158,8 +158,8 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     @ReactMethod
     public void pay(ReadableMap data, Callback callback){
         PayReq payReq = new PayReq();
-        if (data.hasKey("partnerid")) {
-            payReq.partnerId = data.getString("partnerid");
+        if (data.hasKey("partnerId")) {
+            payReq.partnerId = data.getString("partnerId");
         }
         if (data.hasKey("prepayId")) {
             payReq.prepayId = data.getString("prepayId");

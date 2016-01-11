@@ -53,7 +53,7 @@ RCT_EXPORT_MODULE()
     self = [super init];
     if (self) {
         [self _autoRegisterAPI];
-
+        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleOpenURL:) name:@"RCTOpenURLNotification" object:nil];
     }
     return self;
@@ -104,9 +104,9 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
                   :(RCTResponseSenderBlock)callback)
 {
     PayReq* req             = [PayReq new];
-    req.partnerId           = data[@"partnerid"];
-    req.prepayId            = data[@"prepayid"];
-    req.nonceStr            = data[@"noncestr"];
+    req.partnerId           = data[@"partnerId"];
+    req.prepayId            = data[@"prepayId"];
+    req.nonceStr            = data[@"nonceStr"];
     req.timeStamp           = [data[@"timeStamp"] intValue];
     req.package             = data[@"package"];
     req.sign                = data[@"sign"];
@@ -146,7 +146,7 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
         mediaMessage.mediaTagName = aData[@"mediaTagName"];
         mediaMessage.messageAction = aData[@"messageAction"];
         mediaMessage.messageExt = aData[@"messageExt"];
-
+        
         if ([type isEqualToString:RCTWXShareTypeImage]) {
             WXImageObject *imageObject = [WXImageObject new];
             imageObject.imageData = UIImageJPEGRepresentation(aImage, 0.7);
@@ -154,7 +154,7 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
         }
         else {
             [mediaMessage setThumbImage:aImage];
-
+            
             if (type.length <= 0 || [type isEqualToString:RCTWXShareTypeNews]) {
                 WXWebpageObject* webpageObject = [WXWebpageObject new];
                 webpageObject.webpageUrl = aData[RCTWXShareWebpageUrl];
@@ -248,7 +248,7 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
     NSMutableDictionary *body = @{@"errCode":@(resp.errCode)}.mutableCopy;
     body[@"errMsg"] = resp.errStr;
     body[@"errCode"] = @(resp.errCode);
-
+    
     if([resp isKindOfClass:[SendMessageToWXResp class]])
     {
         SendMessageToWXResp *r = (SendMessageToWXResp *)resp;
