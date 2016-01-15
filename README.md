@@ -27,7 +27,7 @@ rnpm link
 在你工程的`AppDelegate.m`文件中添加如下代码：
 
 ```
-#import "RCTLinkingManager.h"
+#import "../Libraries/LinkingIOS/RCTLinkingManager.h"
 
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
@@ -60,13 +60,7 @@ rnpm link
 
 ### 安装Android工程
 
-在app的AndroidManifest.xml中`<application>`标签中添加如下代码：
-
-```
-	<meta-data android:name="WX_APPID" android:value="${WX_APPID}" />
-```
-
-`android/app/build.gradle`里，defaultConfig栏目下添加如下代码：
+在`android/app/build.gradle`里，defaultConfig栏目下添加如下代码：
 
 ```
 		manifestPlaceholders = [

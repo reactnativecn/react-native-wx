@@ -9,5 +9,12 @@
     <application
         android:allowBackup="true"
         >
+        <meta-data android:name="WX_APPID" android:value="${WX_APPID}"/>
+
+        <!-- 微信的回调Activity -->
+        <activity
+            android:name="${applicationId}.wxapi.WXEntryActivity"
+            android:exported="true"
+            />
     </application>
 </manifest>
