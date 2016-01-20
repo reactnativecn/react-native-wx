@@ -105,41 +105,41 @@ dependencies {
 在`android/app/build.gradle`里，defaultConfig栏目下添加如下代码：
 
 ```
-		manifestPlaceholders = [
-			// 如果有多项，每一项之间需要用逗号分隔
-            WX_APPID: "微信的APPID"		//在此修改微信APPID
-        ]
+manifestPlaceholders = [
+	// 如果有多项，每一项之间需要用逗号分隔
+    WX_APPID: "微信的APPID"		//在此修改微信APPID
+]
 ```
 
 
 如果react-native版本<0.18.0,确保你的MainActivity.java中有`onActivityResult`的实现：
 
 ```java
-    private ReactInstanceManager mReactInstanceManager;
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode, resultCode, data);
-        mReactInstanceManager.onActivityResult(requestCode, resultCode, data);
-    }
+private ReactInstanceManager mReactInstanceManager;
+@Override
+public void onActivityResult(int requestCode, int resultCode, Intent data){
+    super.onActivityResult(requestCode, resultCode, data);
+    mReactInstanceManager.onActivityResult(requestCode, resultCode, data);
+}
 ```
 在你的包名相应目录下新建一个wxapi目录，并在该wxapi目录下新增一个WXEntryActivity类，该类继承自Activity（例如应用程序的包名为net.sourceforge.simcpux，则新添加的类的包名为net.sourceforge.simcpux.wxapi）
 
 ```java
-	package net.sourceforge.simcpux.wxapi; // net.sourceforge.simcpux处为你的包名
-	
-    import android.app.Activity;
-	import android.os.Bundle;
-	
-	import cn.reactnative.modules.wx.WeChatModule;
-	
-	public class WXEntryActivity extends Activity{
-	    @Override
-	    protected void onCreate(Bundle savedInstanceState) {
-	        super.onCreate(savedInstanceState);
-	        WeChatModule.handleIntent(getIntent());
-	        finish();
-	    }
-	}
+package net.sourceforge.simcpux.wxapi; // net.sourceforge.simcpux处为你的包名
+
+import android.app.Activity;
+import android.os.Bundle;
+
+import cn.reactnative.modules.wx.WeChatModule;
+
+public class WXEntryActivity extends Activity{
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        WeChatModule.handleIntent(getIntent());
+        finish();
+    }
+}
 		
 ```
 
@@ -228,7 +228,9 @@ data : {
 
 ```javascript
 {
-	"appid": "",
-	"returnKey": ""
+	errCode: "",
+	errMsg: "",
+	appid: "",
+	returnKey: "",
 }
 ```

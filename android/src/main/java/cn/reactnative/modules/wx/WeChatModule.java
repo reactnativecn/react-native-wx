@@ -192,7 +192,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     public void onResp(BaseResp baseResp) {
         WritableMap map = Arguments.createMap();
         map.putInt("errCode", baseResp.errCode);
-        map.putString("errStr", baseResp.errStr);
+        map.putString("errMsg", baseResp.errStr);
         map.putString("transaction", baseResp.transaction);
         if (baseResp instanceof SendAuth.Resp) {
             SendAuth.Resp resp = (SendAuth.Resp)(baseResp);
