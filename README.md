@@ -24,7 +24,7 @@ rnpm link
 
 在`Info->URL Types` 中增加QQ的scheme： `Identifier` 设置为`weixin`, `URL Schemes` 设置为你注册的微信开发者账号中的APPID
 
-在你工程的`AppDelegate.m`文件中添加如下代码：
+如果react-native版本>=0.17.0, 在你工程的`AppDelegate.m`文件中添加如下代码：
 
 ```
 #import "../Libraries/LinkingIOS/RCTLinkingManager.h"
@@ -35,6 +35,17 @@ rnpm link
 }
 
 ```
+
+如果升级有困难，react-native版本实在是<0.17.0, 在你工程的`AppDelegate.m`文件中添加如下代码：
+
+```
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+  [[NSNotificationCenter defaultCenter] postNotificationName:@"RCTOpenURLNotification" object:nil userInfo:@{@"url": url.absoluteString}];
+  return YES;
+}
+
+```
+
 
 ### iOS9的适配问题
 
