@@ -24,7 +24,7 @@ rnpm info Linking react-native-wx android dependency
 rnpm info Linking react-native-wx ios dependency
 ```
 
-#### 手动link~比较麻烦
+#### 手动link~（如果不能够自动link）
 #####ios
 a.打开XCode's工程中, 右键点击Libraries文件夹 ➜ Add Files to <...>
 b.去node_modules ➜ react-native-wx ➜ ios ➜ 选择 RCTWeChat.xcodeproj
@@ -49,8 +49,27 @@ dependencies {
     compile project(':react-native-wx')
 }
 ```
+`android/app/src/main/java/<你的包名>/MainActivity.java`中，`public class MainActivity`之前增加：
 
-### 3.iOS工程配置
+```java
+import cn.reactnative.modules.weibo.WeiboPackage;
+```
+
+如果react-native版本 <0.18.0
+`.addPackage(new MainReactPackage())`之后增加：
+
+```java
+.addPackage(new WeChatPackage())
+```
+如果react-native版本 >=0.18.0
+在`new MainReactPackage()`之后增加
+```java
+,new WeChatPackage()
+```
+
+
+### 3.工程配置
+#### iOS配置
 
 在工程target的`Build Phases->Link Binary with Libraries`中加入`、libsqlite3.tbd、libc++、liz.tbd、CoreTelephony.framework`
 
@@ -78,9 +97,9 @@ dependencies {
 ```
 
 
-### iOS9的适配问题
+##### iOS9的适配问题
 
-#### a.对传输安全的支持
+###### a.对传输安全的支持
 在iOS9中，默认需要为每次网络传输建立SSL，解决方法是在应用plist文件中设置
 -
 	<key>NSAppTransportSecurity</key>
@@ -89,7 +108,7 @@ dependencies {
 	</true>
 	</dict>
 
-#### b.对应用跳转的支持
+###### b.对应用跳转的支持
 在iOS9中跳转第三方应用需要在应用的plist文件中添加白名单
 -
 	<key>LSApplicationQueriesSchemes</key>
@@ -100,7 +119,7 @@ dependencies {
 	
 
 
-### 4.Android工程配置
+#### Android配置
 
 在`android/app/build.gradle`里，defaultConfig栏目下添加如下代码：
 
