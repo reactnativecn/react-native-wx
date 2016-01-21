@@ -46,9 +46,7 @@ RCT_EXPORT_MODULE()
 
 - (NSDictionary *)constantsToExport
 {
-    return @{ @"isAppRegistered":@(gIsAppRegistered),
-              @"isWXAppInstalled": @([WXApi isWXAppInstalled]),
-              @"isWXAppSupportApi": @([WXApi isWXAppSupportApi])};
+    return @{ @"isAppRegistered":@(gIsAppRegistered)};
 }
 
 - (dispatch_queue_t)methodQueue
@@ -238,6 +236,26 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
     gIsAppRegistered = [WXApi registerApp:gAppID];
 }
 
+
+- (NSString *)_getErrorMsg:(int)code {
+    switch (code) {
+        case WXSuccess:
+            return @"成功";
+        case WXErrCodeCommon:
+            return @"普通错误类型";
+        case WXErrCodeUserCancel:
+            return @"用户点击取消并返回";
+        case WXErrCodeSentFail:
+            return @"发送失败";
+        case WXErrCodeAuthDeny:
+            return @"授权失败";
+        case WXErrCodeUnsupport:
+            return @"微信不支持";
+        default:
+            return @"失败";
+    }
+}
+
 #pragma mark - wx callback
 - (void)onReq:(BaseReq*)req
 {
@@ -247,8 +265,14 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
 - (void)onResp:(BaseResp*)resp
 {
     NSMutableDictionary *body = @{@"errCode":@(resp.errCode)}.mutableCopy;
-    body[@"errMsg"] = resp.errStr;
     body[@"errCode"] = @(resp.errCode);
+    
+    if (resp.errStr == nil || resp.errStr.length<=0) {
+        body[@"errMsg"] = [self _getErrorMsg:resp.errCode];
+    }
+    else{
+        body[@"errMsg"] = resp.errStr;
+    }
     
     if([resp isKindOfClass:[SendMessageToWXResp class]])
     {

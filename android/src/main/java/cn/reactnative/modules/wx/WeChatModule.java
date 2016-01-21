@@ -106,8 +106,6 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     public Map<String, Object> getConstants() {
         final Map<String, Object> constants = new HashMap<>();
         constants.put("isAppRegistered", gIsAppRegistered);
-        constants.put("isWXAppInstalled", api!=null && api.isWXAppInstalled());
-        constants.put("isWXAppSupportApi", api!=null && api.isWXAppSupportAPI());
         return constants;
     }
 
@@ -200,7 +198,12 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     public void onResp(BaseResp baseResp) {
         WritableMap map = Arguments.createMap();
         map.putInt("errCode", baseResp.errCode);
-        map.putString("errStr", baseResp.errStr);
+        if (baseResp.errStr == null || baseResp.errStr.length()<=0) {
+            map.putString("errStr", _getErrorMsg(baseResp.errCode));
+        }
+        else {
+            map.putString("errStr", baseResp.errStr);
+        }
         map.putString("transaction", baseResp.transaction);
         if (baseResp instanceof SendAuth.Resp) {
             SendAuth.Resp resp = (SendAuth.Resp)(baseResp);
@@ -231,6 +234,25 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     public static void handleIntent(Intent intent) {
         if (gModule != null) {
             api.handleIntent(intent, gModule);
+        }
+    }
+
+    private String _getErrorMsg(int errCode) {
+        switch (errCode) {
+            case BaseResp.ErrCode.ERR_OK:
+                return "成功";
+            case BaseResp.ErrCode.ERR_COMM:
+                return "普通错误类型";
+            case BaseResp.ErrCode.ERR_USER_CANCEL:
+                return "用户点击取消并返回";
+            case BaseResp.ErrCode.ERR_SENT_FAILED:
+                return "发送失败";
+            case BaseResp.ErrCode.ERR_AUTH_DENIED:
+                return "授权失败";
+            case BaseResp.ErrCode.ERR_UNSUPPORT:
+                return "微信不支持";
+            default:
+                return "失败";
         }
     }
 
