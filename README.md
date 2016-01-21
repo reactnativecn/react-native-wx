@@ -175,6 +175,11 @@ import * as WechatAPI from 'react-native-wx';
 ```
 
 ### API
+#### WechatAPI.isWXAppInstalled()
+返回一个`Promise`对象
+
+#### WechatAPI.isWXAppSupportApi()
+返回一个`Promise`对象
 
 #### WechatAPI.login(config)
 

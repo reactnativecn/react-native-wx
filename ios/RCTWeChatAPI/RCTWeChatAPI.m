@@ -35,13 +35,21 @@
 @interface RCTWeChatAPI()<WXApiDelegate>
 @end
 
-NSString *gAppID = @"";
+static NSString *gAppID = @"";
+static BOOL gIsAppRegistered = false;
 
 @implementation RCTWeChatAPI
 
 @synthesize bridge = _bridge;
 
 RCT_EXPORT_MODULE()
+
+- (NSDictionary *)constantsToExport
+{
+    return @{ @"isAppRegistered":@(gIsAppRegistered),
+              @"isWXAppInstalled": @([WXApi isWXAppInstalled]),
+              @"isWXAppSupportApi": @([WXApi isWXAppSupportApi])};
+}
 
 - (dispatch_queue_t)methodQueue
 {
@@ -66,10 +74,6 @@ RCT_EXPORT_MODULE()
 
 RCT_EXPORT_METHOD(isWXAppInstalled:(RCTResponseSenderBlock)callback)
 {
-    if (gAppID.length<=0) {
-        callback(@[NOT_REGISTERED]);
-        return;
-    }
     callback(@[[NSNull null], @([WXApi isWXAppInstalled])]);
 }
 
@@ -107,7 +111,7 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
     req.partnerId           = data[@"partnerId"];
     req.prepayId            = data[@"prepayId"];
     req.nonceStr            = data[@"nonceStr"];
-    req.timeStamp           = [data[@"timeStamp"] intValue];
+    req.timeStamp           = [data[@"timeStamp"] unsignedIntValue];
     req.package             = data[@"package"];
     req.sign                = data[@"sign"];
     BOOL success = [WXApi sendReq:req];
@@ -215,26 +219,23 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
 
 - (void)_autoRegisterAPI
 {
-    if (gAppID.length > 0) {
+    if (gAppID.length > 0 && gIsAppRegistered) {
         return;
     }
     
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        NSArray *list = [[[NSBundle mainBundle] infoDictionary] valueForKey:@"CFBundleURLTypes"];
-        for (NSDictionary *item in list) {
-            NSString *name = item[@"CFBundleURLName"];
-            if ([name isEqualToString:@"weixin"]) {
-                NSArray *schemes = item[@"CFBundleURLSchemes"];
-                if (schemes.count > 0)
-                {
-                    gAppID = schemes[0];
-                    break;
-                }
+    NSArray *list = [[[NSBundle mainBundle] infoDictionary] valueForKey:@"CFBundleURLTypes"];
+    for (NSDictionary *item in list) {
+        NSString *name = item[@"CFBundleURLName"];
+        if ([name isEqualToString:@"weixin"]) {
+            NSArray *schemes = item[@"CFBundleURLSchemes"];
+            if (schemes.count > 0)
+            {
+                gAppID = schemes[0];
+                break;
             }
         }
-        [WXApi registerApp:gAppID];
-    });
+    }
+    gIsAppRegistered = [WXApi registerApp:gAppID];
 }
 
 #pragma mark - wx callback

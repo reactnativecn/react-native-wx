@@ -57,11 +57,14 @@ import com.tencent.mm.sdk.openapi.WXAPIFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEventHandler {
     static private String appId = null;
     static private IWXAPI api = null;
     private static WeChatModule gModule = null;
+    private static boolean gIsAppRegistered = false;
 
     private final static String NOT_REGISTERED = "registerApp required.";
     private final static String INVOKE_FAILED = "WeChat API invoke returns false.";
@@ -100,6 +103,15 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     }
 
     @Override
+    public Map<String, Object> getConstants() {
+        final Map<String, Object> constants = new HashMap<>();
+        constants.put("isAppRegistered", gIsAppRegistered);
+        constants.put("isWXAppInstalled", api!=null && api.isWXAppInstalled());
+        constants.put("isWXAppSupportApi", api!=null && api.isWXAppSupportAPI());
+        return constants;
+    }
+
+    @Override
     public String getName() {
         return "RCTWeChatAPI";
     }
@@ -118,10 +130,6 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
 
     @ReactMethod
     public void isWXAppInstalled(Callback callback) {
-        if (api == null) {
-            callback.invoke(NOT_REGISTERED);
-            return;
-        }
         callback.invoke(null, api.isWXAppInstalled());
     }
 
@@ -192,7 +200,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     public void onResp(BaseResp baseResp) {
         WritableMap map = Arguments.createMap();
         map.putInt("errCode", baseResp.errCode);
-        map.putString("errMsg", baseResp.errStr);
+        map.putString("errStr", baseResp.errStr);
         map.putString("transaction", baseResp.transaction);
         if (baseResp instanceof SendAuth.Resp) {
             SendAuth.Resp resp = (SendAuth.Resp)(baseResp);
@@ -227,12 +235,9 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     }
 
     private void _autoRegisterAppId() {
-        if (api == null) {
+        if (!gIsAppRegistered) {
             api = WXAPIFactory.createWXAPI(getReactApplicationContext(), appId, false);
-            boolean success = api.registerApp(appId);
-            if (!success) {
-                api = null;
-            }
+            gIsAppRegistered = api.registerApp(appId);
         }
     }
 
