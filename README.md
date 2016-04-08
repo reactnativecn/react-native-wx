@@ -15,7 +15,7 @@ npm install react-native-wx --save
 #### 自动link方法~rnpm requires node version 4.1 or higher
 
 ```bash
-rnpm link
+rnpm link react-native-wx
 ```
 link成功命令行会提示
 
@@ -52,7 +52,7 @@ dependencies {
 `android/app/src/main/java/<你的包名>/MainActivity.java`中，`public class MainActivity`之前增加：
 
 ```java
-import cn.reactnative.modules.weibo.WeiboPackage;
+import cn.reactnative.modules.wx.WeChatPackage;
 ```
 
 如果react-native版本 <0.18.0
