@@ -91,6 +91,7 @@ function wrapApi(nativeFunc) {
 const nativeSendAuthRequest = wrapApi(WeChatAPI.login);
 const nativeShareToTimelineRequest = wrapApi(WeChatAPI.shareToTimeline);
 const nativeShareToSessionRequest = wrapApi(WeChatAPI.shareToSession);
+const nativeFavoriteRequest = wrapApi(WeChatAPI.favorite);
 const nativePayRequest = wrapApi(WeChatAPI.pay);
 
 export function login(config) {
@@ -108,7 +109,10 @@ export function shareToSession(data) {
   return nativeShareToSessionRequest(data)
       .then(() => waitForResponse("SendMessageToWX.Resp"));
 }
-
+export function favorite (data) {
+  return nativeFavoriteRequest(data)
+    .then(() => waitForResponse("SendMessageToWX.Resp"));
+}
 export function pay(data) {
   return nativePayRequest(data)
       .then(() => waitForResponse("Pay.Resp"));

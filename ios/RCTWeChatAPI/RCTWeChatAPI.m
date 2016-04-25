@@ -101,6 +101,12 @@ RCT_EXPORT_METHOD(shareToSession:(NSDictionary *)data
 {
     [self shareToWeixinWithData:data scene:WXSceneSession callback:callback];
 }
+//微信收藏
+RCT_EXPORT_METHOD(favorite:(NSDictionary *)data
+                  :(RCTResponseSenderBlock)callback)
+{
+    [self shareToWeixinWithData:data scene:WXSceneFavorite callback:callback];
+}
 
 RCT_EXPORT_METHOD(pay:(NSDictionary *)data
                   :(RCTResponseSenderBlock)callback)
@@ -187,10 +193,7 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
     }
     
     BOOL success = [WXApi sendReq:req];
-    if (success == NO)
-    {
-        callback(@[INVOKE_FAILED]);
-    }
+    callback(@[success ? [NSNull null] : INVOKE_FAILED]);
 }
 
 
