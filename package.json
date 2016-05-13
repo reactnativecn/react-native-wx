@@ -1,6 +1,6 @@
 {
   "name": "react-native-wx",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "微信登录、分享、支付模块",
   "main": "index.js",
   "scripts": {
