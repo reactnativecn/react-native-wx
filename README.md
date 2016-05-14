@@ -71,7 +71,7 @@ import cn.reactnative.modules.wx.WeChatPackage;
 ### 3.工程配置
 #### iOS配置
 
-在工程target的`Build Phases->Link Binary with Libraries`中加入`、libsqlite3.tbd、libc++、liz.tbd、CoreTelephony.framework`
+在工程target的`Build Phases->Link Binary with Libraries`中加入`、libsqlite3.tbd、libc++、libz.tbd、CoreTelephony.framework`
 
 
 在`Info->URL Types` 中增加微信的scheme： `Identifier` 设置为`weixin`（这个拼写不能错哦）, `URL Schemes` 设置为你注册的微信开发者账号中的APPID
@@ -201,9 +201,9 @@ config : {
 }
 ```
 
-#### WeiboAPI.shareToTimeline(data)
+#### WechatAPI.shareToTimeline(data)
 分享到朋友圈
-#### WeiboAPI.shareToSession(data)
+#### WechatAPI.shareToSession(data)
 分享到好友
 
 ```javascript
@@ -235,7 +235,7 @@ config : {
 }
 ```
 
-#### WeiboAPI.pay(data)
+#### WechatAPI.pay(data)
 ```javascript
 // 登录参数 
 data : {	
