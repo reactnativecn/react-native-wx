@@ -1,7 +1,8 @@
 # react-native-wx
 
 React Native的微信插件, 包括登录、分享
-#### note: react-native版本需要0.17.0及以上
+#### 注意: react-native版本需要0.17.0及以上
+#### 注意：iOS应用只要申请并获取到AppID就可进行调试。Android应用除了获取AppID外，应用还要通过审核，否则无法调起微信进行分享，并且需要在网站上填写包名和签名两个字段，签名可使用签名生成工具获取。[具体方法见开放平台说明](https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&t=resource/res_list&verify=1&id=open1419318060&token=&lang=zh_CN)
 
 ## 如何安装
 
@@ -161,10 +162,6 @@ public class WXEntryActivity extends Activity{
 }
 		
 ```
-
-
-##### note:Android还需要对keystore文件进行md5签名之后，在开放平台的应用设置中设置相应签名才可以成功使用，具体方法见开放平台说明
-
 
 ## 如何使用
 
