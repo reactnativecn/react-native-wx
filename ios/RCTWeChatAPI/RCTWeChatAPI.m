@@ -149,14 +149,13 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
         mediaMessage.messageAction = aData[@"messageAction"];
         mediaMessage.messageExt = aData[@"messageExt"];
         
+        [mediaMessage setThumbImage:aImage];
         if ([type isEqualToString:RCTWXShareTypeImage]) {
             WXImageObject *imageObject = [WXImageObject new];
             imageObject.imageData = UIImageJPEGRepresentation(aImage, 0.7);
             mediaMessage.mediaObject = imageObject;
         }
         else {
-            [mediaMessage setThumbImage:aImage];
-            
             if (type.length <= 0 || [type isEqualToString:RCTWXShareTypeNews]) {
                 WXWebpageObject* webpageObject = [WXWebpageObject new];
                 webpageObject.webpageUrl = aData[RCTWXShareWebpageUrl];
