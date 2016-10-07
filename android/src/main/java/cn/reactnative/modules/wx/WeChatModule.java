@@ -336,6 +336,8 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
             if (data.hasKey(RCTWXShareImageUrl)) {
                 if (image != null) {
                     object.imageData = _Bitmap2Bytes(image);
+                    Bitmap thumb = Bitmap.createScaledBitmap(image, 80, 80, true);
+                    message.thumbData = _Bitmap2Bytes(thumb);
                 }
             }
             message.mediaObject = object;
