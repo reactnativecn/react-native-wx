@@ -1,6 +1,6 @@
 {
   "name": "react-native-wx",
-  "version": "1.0.11",
+  "version": "2.0.0",
   "description": "微信登录、分享、支付模块",
   "main": "index.js",
   "scripts": {
@@ -28,5 +28,8 @@
   "homepage": "https://github.com/reactnativecn/react-native-wx#readme",
   "dependencies": {
     "es6-promisify": "^3.0.0"
+  },
+  "peerDependencies": {
+    "react-native": "^0.33.0"
   }
 }
