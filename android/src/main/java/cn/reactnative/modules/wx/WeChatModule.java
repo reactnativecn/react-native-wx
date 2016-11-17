@@ -25,7 +25,6 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.drawable.OrientedDrawable;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.core.ImagePipeline;
-import com.facebook.imagepipeline.image.CloseableAnimatedImage;
 import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.image.CloseableStaticBitmap;
 import com.facebook.imagepipeline.image.EncodedImage;
@@ -456,9 +455,6 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
             } else {
                 return new OrientedDrawable(bitmapDrawable, closeableStaticBitmap.getRotationAngle());
             }
-        } else if (closeableImage instanceof CloseableAnimatedImage) {
-            return Fresco.getImagePipelineFactory().getAnimatedDrawableFactory().create(
-                    ((CloseableAnimatedImage) closeableImage).getImageResult());
         } else {
             throw new UnsupportedOperationException("Unrecognized image class: " + closeableImage);
         }
