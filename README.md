@@ -50,22 +50,35 @@ dependencies {
     compile project(':react-native-wx')
 }
 ```
-`android/app/src/main/java/<你的包名>/MainActivity.java`中，`public class MainActivity`之前增加：
+
+`android/app/src/main/java/<你的包名>/MainApplication.java`中添加如下两行：
 
 ```java
-import cn.reactnative.modules.wx.WeChatPackage;
-```
+...
+import cn.reactnative.modules.wx.WeChatPackage;  // 在public class MainApplication之前import
 
-如果react-native版本 <0.18.0
-`.addPackage(new MainReactPackage())`之后增加：
+public class MainApplication extends Application implements ReactApplication {
 
-```java
-.addPackage(new WeChatPackage())
-```
-如果react-native版本 >=0.18.0
-在`new MainReactPackage()`之后增加
-```java
-,new WeChatPackage()
+  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+    @Override
+    protected boolean getUseDeveloperSupport() {
+      return BuildConfig.DEBUG;
+    }
+
+    @Override
+    protected List<ReactPackage> getPackages() {
+      return Arrays.<ReactPackage>asList(
+          new WeChatPackage(), // 然后添加这一行
+	  new MainReactPackage()
+      );
+    }
+  };
+
+  @Override
+  public ReactNativeHost getReactNativeHost() {
+      return mReactNativeHost;
+  }
+}
 ```
 
 
