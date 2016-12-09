@@ -69,7 +69,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new WeChatPackage(), // 然后添加这一行
-	  new MainReactPackage()
+          new MainReactPackage()
       );
     }
   };
