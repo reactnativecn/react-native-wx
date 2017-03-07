@@ -6,14 +6,22 @@
 //  Copyright © 2016 erica. All rights reserved.
 //
 
-
-#import "RCTLog.h"
 #import "RCTWeChatAPI.h"
-#import "WXApi.h"
-#import "WXApiObject.h"
+
+#if __has_include(<React/RCTBridge.h>)
+#import <React/RCTLog.h>
+#import <React/RCTBridge.h>
+#import <React/RCTEventDispatcher.h>
+#import <React/RCTImageLoader.h>
+#else
+#import "RCTLog.h"
 #import "RCTEventDispatcher.h"
 #import "RCTBridge.h"
 #import "RCTImageLoader.h"
+#endif
+
+#import "WXApi.h"
+#import "WXApiObject.h"
 
 #define RCTWXShareTypeNews @"news"
 #define RCTWXShareTypeImage @"image"
