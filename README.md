@@ -13,16 +13,10 @@ npm install react-native-wx --save
 ```
 
 ### 2.link
-#### 自动link方法~rnpm requires node version 4.1 or higher
+#### 自动link方法
 
 ```bash
-rnpm link react-native-wx
-```
-link成功命令行会提示
-
-```bash
-rnpm info Linking react-native-wx android dependency 
-rnpm info Linking react-native-wx ios dependency
+react-native link react-native-wx
 ```
 
 #### 手动link~（如果不能够自动link）
