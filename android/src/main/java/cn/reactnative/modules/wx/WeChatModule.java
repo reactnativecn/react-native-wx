@@ -390,11 +390,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
         req.message = message;
         req.scene = scene;
 
-        boolean success = api.sendReq(req);
-
-        if (success == false) {
-            callback.invoke("INVOKE_FAILED");
-        }
+        callback.invoke(api.sendReq(req) ? null : INVOKE_FAILED);
     }
 
     private static @Nullable
