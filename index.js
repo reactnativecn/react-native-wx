@@ -1,5 +1,12 @@
 import { NativeAppEventEmitter, NativeModules } from 'react-native';
-import promisify from 'es6-promisify';
+
+function promisify(fn, handler) {
+  return function (...args) {
+    return new Promise(function () {
+      fn(...args, handler.bind(this))
+    })
+  }
+}
 
 const WeChatAPI = NativeModules.WeChatAPI;
 
