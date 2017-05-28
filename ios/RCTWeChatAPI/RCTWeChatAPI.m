@@ -102,12 +102,14 @@ RCT_EXPORT_METHOD(shareToTimeline:(NSDictionary *)data
                   :(RCTResponseSenderBlock)callback)
 {
     [self shareToWeixinWithData:data scene:WXSceneTimeline callback:callback];
+     callback(@[[NSNull null]]);
 }
 
 RCT_EXPORT_METHOD(shareToSession:(NSDictionary *)data
                   :(RCTResponseSenderBlock)callback)
 {
     [self shareToWeixinWithData:data scene:WXSceneSession callback:callback];
+     callback(@[[NSNull null]]);
 }
 
 RCT_EXPORT_METHOD(pay:(NSDictionary *)data
