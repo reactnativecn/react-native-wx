@@ -11,7 +11,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.NinePatchDrawable;
 import android.net.Uri;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.facebook.common.executors.UiThreadImmediateExecutorService;
@@ -393,8 +392,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
         callback.invoke(api.sendReq(req) ? null : INVOKE_FAILED);
     }
 
-    private static @Nullable
-    Uri getResourceDrawableUri(Context context, @Nullable String name) {
+    private static Uri getResourceDrawableUri(Context context, String name) {
         if (name == null || name.isEmpty()) {
             return null;
         }
