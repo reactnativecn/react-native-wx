@@ -7,13 +7,13 @@
 //
 
 
-#import "RCTLog.h"
+#import <React/RCTLog.h>
 #import "RCTWeChatAPI.h"
 #import "WXApi.h"
 #import "WXApiObject.h"
-#import "RCTEventDispatcher.h"
-#import "RCTBridge.h"
-#import "RCTImageLoader.h"
+#import <React/RCTEventDispatcher.h>
+#import <React/RCTBridge.h>
+#import <React/RCTImageLoader.h>
 
 #define RCTWXShareTypeNews @"news"
 #define RCTWXShareTypeImage @"image"

@@ -6,7 +6,7 @@
 //  Copyright © 2016 erica. All rights reserved.
 //
 
-#import "RCTBridgeModule.h"
+#import <React/RCTBridgeModule.h>
 
 @interface RCTWeChatAPI : NSObject <RCTBridgeModule>
 
