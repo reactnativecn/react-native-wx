@@ -28,6 +28,6 @@
   "homepage": "https://github.com/reactnativecn/react-native-wx#readme",
   "dependencies": {},
   "peerDependencies": {
-    "react-native": "^0.33.0"
+    "react-native": "*"
   }
 }
