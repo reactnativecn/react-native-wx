@@ -49,9 +49,9 @@ RCT_EXPORT_MODULE()
     return @{ @"isAppRegistered":@(gIsAppRegistered)};
 }
 
-- (dispatch_queue_t)methodQueue
++ (BOOL)requiresMainQueueSetup
 {
-    return dispatch_get_main_queue();
+   return YES;
 }
 
 - (instancetype)init
