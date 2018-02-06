@@ -1,5 +1,5 @@
 import { NativeAppEventEmitter, NativeModules } from 'react-native';
-import promisify from 'es6-promisify';
+import Promise from 'bluebird';
 
 const WeChatAPI = NativeModules.WeChatAPI;
 
@@ -57,7 +57,7 @@ function wrapCheckApi(nativeFunc) {
     return undefined;
   }
 
-  const promisified = promisify(nativeFunc, translateError);
+  const promisified = Promise.promisify(nativeFunc, translateError);
   return (...args) => {
     return promisified(...args);
   };
@@ -71,7 +71,7 @@ function wrapApi(nativeFunc) {
     return undefined;
   }
 
-  const promisified = promisify(nativeFunc, translateError);
+  const promisified = Promise.promisify(nativeFunc, translateError);
   return async function (...args) {
     if (!WeChatAPI.isAppRegistered) {
       throw new Error('注册应用失败');
