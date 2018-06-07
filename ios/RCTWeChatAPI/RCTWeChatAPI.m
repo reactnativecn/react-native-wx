@@ -186,10 +186,7 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
     }
     
     BOOL success = [WXApi sendReq:req];
-    if (success == NO)
-    {
-        callback(@[INVOKE_FAILED]);
-    }
+    callback(@[success ? [NSNull null] : INVOKE_FAILED]);
 }
 
 
