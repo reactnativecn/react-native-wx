@@ -66,7 +66,13 @@ function wrapApi(nativeFunc) {
     if (!checkInstalled) {
       throw new Error('没有安装微信!');
     }
-    const checkSupport = await isWXAppSupportApi();
+    let type = '';
+    if (nativeFunc === WeChatAPI.pay) {
+      type = 'Pay';
+    } else if (nativeFunc === WeChatAPI.launchMiniPro) {
+      type = 'WXLaunchMiniProgram';
+    }
+    const checkSupport = await isWXAppSupportApi(type);
     if (!checkSupport) {
       throw new Error('微信版本不支持');
     }
@@ -78,6 +84,7 @@ const nativeSendAuthRequest = wrapApi(WeChatAPI.login);
 const nativeShareToTimelineRequest = wrapApi(WeChatAPI.shareToTimeline);
 const nativeShareToSessionRequest = wrapApi(WeChatAPI.shareToSession);
 const nativePayRequest = wrapApi(WeChatAPI.pay);
+const nativeLaunchMiniProRequest = wrapApi(WeChatAPI.launchMiniPro);
 
 export function login(config) {
   const scope = (config && config.scope) || 'snsapi_userinfo';
@@ -100,3 +107,7 @@ export function pay(data) {
       .then(() => waitForResponse("Pay.Resp"));
 }
 
+export function launchMiniPro(data) {
+  return nativeLaunchMiniProRequest(data)
+      .then(() => waitForResponse("WXLaunchMiniProgram.Resp"));
+}

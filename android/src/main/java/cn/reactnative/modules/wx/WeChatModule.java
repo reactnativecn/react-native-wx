@@ -37,21 +37,25 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.RCTNativeAppEventEmitter;
-import com.tencent.mm.sdk.modelbase.BaseReq;
-import com.tencent.mm.sdk.modelbase.BaseResp;
-import com.tencent.mm.sdk.modelmsg.SendAuth;
-import com.tencent.mm.sdk.modelmsg.SendMessageToWX;
-import com.tencent.mm.sdk.modelmsg.WXImageObject;
-import com.tencent.mm.sdk.modelmsg.WXMediaMessage;
-import com.tencent.mm.sdk.modelmsg.WXMusicObject;
-import com.tencent.mm.sdk.modelmsg.WXTextObject;
-import com.tencent.mm.sdk.modelmsg.WXVideoObject;
-import com.tencent.mm.sdk.modelmsg.WXWebpageObject;
-import com.tencent.mm.sdk.modelpay.PayReq;
-import com.tencent.mm.sdk.modelpay.PayResp;
-import com.tencent.mm.sdk.openapi.IWXAPI;
-import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
-import com.tencent.mm.sdk.openapi.WXAPIFactory;
+import com.tencent.mm.opensdk.constants.Build;
+import com.tencent.mm.opensdk.constants.ConstantsAPI;
+import com.tencent.mm.opensdk.modelbase.BaseReq;
+import com.tencent.mm.opensdk.modelbase.BaseResp;
+import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
+import com.tencent.mm.opensdk.modelmsg.SendAuth;
+import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
+import com.tencent.mm.opensdk.modelmsg.WXImageObject;
+import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
+import com.tencent.mm.opensdk.modelmsg.WXMiniProgramObject;
+import com.tencent.mm.opensdk.modelmsg.WXMusicObject;
+import com.tencent.mm.opensdk.modelmsg.WXTextObject;
+import com.tencent.mm.opensdk.modelmsg.WXVideoObject;
+import com.tencent.mm.opensdk.modelmsg.WXWebpageObject;
+import com.tencent.mm.opensdk.modelpay.PayReq;
+import com.tencent.mm.opensdk.modelpay.PayResp;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
@@ -72,6 +76,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     private static final String RCTWXShareTypeText = "text";
     private static final String RCTWXShareTypeVideo = "video";
     private static final String RCTWXShareTypeAudio = "audio";
+    private static final String RCTWXShareTypeMiniPro = "miniprogram";
 
     private static final String RCTWXShareType = "type";
     private static final String RCTWXShareText = "text";
@@ -80,6 +85,9 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     private static final String RCTWXShareWebpageUrl = "webpageUrl";
     private static final String RCTWXShareImageUrl = "imageUrl";
     private static final String RCTWXShareThumbImageSize = "thumbImageSize";
+    private static final String RCTWXShareUserName = "userName";
+    private static final String RCTWXSharePath = "path";
+    private static final String RCTWXShareMiniProType = "miniprogramType";
 
     public WeChatModule(ReactApplicationContext reactContext) {
 
@@ -92,7 +100,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
             } catch (PackageManager.NameNotFoundException e) {
                 throw new Error(e);
             }
-            if (!appInfo.metaData.containsKey("WX_APPID")){
+            if (!appInfo.metaData.containsKey("WX_APPID")) {
                 throw new Error("meta-data WX_APPID not found in AndroidManifest.xml");
             }
             appId = appInfo.metaData.get("WX_APPID").toString();
@@ -130,8 +138,16 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     }
 
     @ReactMethod
-    public void isWXAppSupportApi(Callback callback) {
-        callback.invoke(null, api.isWXAppSupportAPI());
+    public void isWXAppSupportApi(String type, Callback callback) {
+        int apiVersion = api.getWXAppSupportAPI();
+        boolean isSupport = apiVersion >= Build.MIN_SDK_INT;
+        if (type == "Pay") {
+            isSupport &= apiVersion >= Build.PAY_SUPPORTED_SDK_INT;
+        } else if (type == "WXLaunchMiniProgram") {
+            isSupport &= apiVersion >= Build.MINIPROGRAM_SUPPORTED_SDK_INT;
+        }
+
+        callback.invoke(null, isSupport);
     }
 
     @ReactMethod
@@ -142,8 +158,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
         }
         if (config.hasKey("state")) {
             req.state = config.getString("state");
-        }
-        else {
+        } else {
             req.state = new Date().toString();
         }
         callback.invoke(api.sendReq(req) ? null : INVOKE_FAILED);
@@ -155,12 +170,12 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     }
 
     @ReactMethod
-    public void shareToSession(ReadableMap data, Callback callback){
+    public void shareToSession(ReadableMap data, Callback callback) {
         _share(SendMessageToWX.Req.WXSceneSession, data, callback);
     }
 
     @ReactMethod
-    public void pay(ReadableMap data, Callback callback){
+    public void pay(ReadableMap data, Callback callback) {
         PayReq payReq = new PayReq();
         if (data.hasKey("partnerId")) {
             payReq.partnerId = data.getString("partnerId");
@@ -187,6 +202,26 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
         callback.invoke(api.sendReq(payReq) ? null : INVOKE_FAILED);
     }
 
+    @ReactMethod
+    public void launchMiniPro(ReadableMap data, Callback callback) {
+        WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
+        req.userName = data.getString("userName");
+        req.path = data.getString("path");
+        int type = data.getInt("type");
+        switch (type) {
+            case 1:
+                req.miniprogramType = WXLaunchMiniProgram.Req.MINIPROGRAM_TYPE_TEST;
+                break;
+            case 2:
+                req.miniprogramType = WXLaunchMiniProgram.Req.MINIPROGRAM_TYPE_PREVIEW;
+                break;
+            default:
+                req.miniprogramType = WXLaunchMiniProgram.Req.MINIPTOGRAM_TYPE_RELEASE;
+                break;
+        }
+        callback.invoke(api.sendReq(req) ? null : INVOKE_FAILED);
+    }
+
     @Override
     public void onReq(BaseReq baseReq) {
 
@@ -196,32 +231,42 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     public void onResp(BaseResp baseResp) {
         WritableMap map = Arguments.createMap();
         map.putInt("errCode", baseResp.errCode);
-        if (baseResp.errStr == null || baseResp.errStr.length()<=0) {
+        if (baseResp.errStr == null || baseResp.errStr.length() <= 0) {
             map.putString("errStr", _getErrorMsg(baseResp.errCode));
-        }
-        else {
+        } else {
             map.putString("errStr", baseResp.errStr);
         }
         map.putString("transaction", baseResp.transaction);
-        if (baseResp instanceof SendAuth.Resp) {
-            SendAuth.Resp resp = (SendAuth.Resp)(baseResp);
 
-            map.putString("type", "SendAuth.Resp");
-            map.putString("code", resp.code);
-            map.putString("state", resp.state);
-            map.putString("url", resp.url);
-            map.putString("lang", resp.lang);
-            map.putString("country", resp.country);
-            map.putString("appid", appId);
-        }
-        else if (baseResp instanceof SendMessageToWX.Resp){
-            SendMessageToWX.Resp resp = (SendMessageToWX.Resp)(baseResp);
-            map.putString("type", "SendMessageToWX.Resp");
-        }
-        else if (baseResp instanceof PayResp) {
-            PayResp resp = (PayResp)(baseResp);
-            map.putString("type", "Pay.Resp");
-            map.putString("returnKey", resp.returnKey);
+        switch (baseResp.getType()) {
+            case ConstantsAPI.COMMAND_SENDAUTH:
+                SendAuth.Resp authResp = (SendAuth.Resp) (baseResp);
+                map.putString("type", "SendAuth.Resp");
+                map.putString("code", authResp.code);
+                map.putString("state", authResp.state);
+                map.putString("url", authResp.url);
+                map.putString("lang", authResp.lang);
+                map.putString("country", authResp.country);
+                map.putString("appid", appId);
+                break;
+            case ConstantsAPI.COMMAND_SENDMESSAGE_TO_WX:
+                SendMessageToWX.Resp msgResp = (SendMessageToWX.Resp) (baseResp);
+                map.putString("type", "SendMessageToWX.Resp");
+                break;
+            case ConstantsAPI.COMMAND_PAY_BY_WX:
+                PayResp payResp = (PayResp) (baseResp);
+                map.putString("type", "Pay.Resp");
+                map.putString("returnKey", payResp.returnKey);
+                map.putString("prepayId", payResp.prepayId);
+                map.putString("extData", payResp.extData);
+                break;
+            case ConstantsAPI.COMMAND_LAUNCH_WX_MINIPROGRAM:
+                WXLaunchMiniProgram.Resp launchMiniProResp = (WXLaunchMiniProgram.Resp) baseResp;
+                map.putString("type", "WXLaunchMiniProgram.Resp");
+                map.putString("extMsg", launchMiniProResp.extMsg);
+                break;
+            default:
+                break;
         }
 
         getReactApplicationContext()
@@ -261,7 +306,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
         }
     }
 
-    private void _share(final int scene, final ReadableMap data, final Callback callBack){
+    private void _share(final int scene, final ReadableMap data, final Callback callBack) {
 
         if (data.hasKey(RCTWXShareImageUrl)) {
             String imageUrl = data.getString(RCTWXShareImageUrl);
@@ -283,6 +328,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
                             }
                             dataSource.close();
                         }
+
                         @Override
                         public void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
                             dataSource.close();
@@ -302,15 +348,14 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
                 resizeOptions = new ResizeOptions(size, size);
             }
             _downloadImage(imageUrl, resizeOptions, dataSubscriber);
-        }
-        else {
+        } else {
             _share(scene, data, null, callBack);
         }
     }
 
     private void _share(int scene, ReadableMap data, Bitmap image, Callback callback) {
         WXMediaMessage message = new WXMediaMessage();
-        if (data.hasKey(RCTWXShareTitle)){
+        if (data.hasKey(RCTWXShareTitle)) {
             message.title = data.getString(RCTWXShareTitle);
         }
         if (data.hasKey(RCTWXShareDescription)) {
@@ -328,8 +373,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
                 object.text = data.getString(RCTWXShareText);
             }
             message.mediaObject = object;
-        }
-        else if (type.equals(RCTWXShareTypeImage)) {
+        } else if (type.equals(RCTWXShareTypeImage)) {
             WXImageObject object = new WXImageObject();
             if (data.hasKey(RCTWXShareImageUrl)) {
                 if (image != null) {
@@ -339,29 +383,44 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
                 }
             }
             message.mediaObject = object;
-        }
-        else {
+        } else {
             if (type.equals(RCTWXShareTypeNews)) {
                 WXWebpageObject object = new WXWebpageObject();
-                if (data.hasKey(RCTWXShareWebpageUrl)){
+                if (data.hasKey(RCTWXShareWebpageUrl)) {
                     object.webpageUrl = data.getString(RCTWXShareWebpageUrl);
                 }
-                if (data.hasKey("extInfo")){
+                if (data.hasKey("extInfo")) {
                     object.extInfo = data.getString("extInfo");
                 }
                 message.mediaObject = object;
-            }
-            else if (type.equals(RCTWXShareTypeVideo)) {
+            } else if (type.equals(RCTWXShareTypeVideo)) {
                 WXMusicObject object = new WXMusicObject();
                 if (data.hasKey(RCTWXShareWebpageUrl)) {
                     object.musicUrl = data.getString(RCTWXShareWebpageUrl);
                 }
                 message.mediaObject = object;
-            }
-            else if (type.equals(RCTWXShareTypeAudio)) {
+            } else if (type.equals(RCTWXShareTypeAudio)) {
                 WXVideoObject object = new WXVideoObject();
                 if (data.hasKey(RCTWXShareWebpageUrl)) {
                     object.videoUrl = data.getString(RCTWXShareWebpageUrl);
+                }
+                message.mediaObject = object;
+            } else if (type.equals(RCTWXShareTypeMiniPro)) {
+                WXMiniProgramObject object = new WXMiniProgramObject();
+                if (data.hasKey(RCTWXShareWebpageUrl)) {
+                    object.webpageUrl = data.getString(RCTWXShareWebpageUrl);
+                }
+                object.userName = data.getString(RCTWXShareUserName);
+                if (data.hasKey(RCTWXSharePath)) {
+                    object.path = data.getString(RCTWXSharePath);
+                }
+                object.miniprogramType = WXMiniProgramObject.MINIPTOGRAM_TYPE_RELEASE;
+                if (data.hasKey(RCTWXShareMiniProType)) {
+                    object.miniprogramType = data.getInt(RCTWXShareMiniProType);
+                }
+                if (data.hasKey(RCTWXShareImageUrl) && image != null) {
+                    Bitmap thumb = Bitmap.createScaledBitmap(image, 375, 300, true);
+                    message.thumbData = _Bitmap2Bytes(thumb);
                 }
                 message.mediaObject = object;
             }
@@ -369,7 +428,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
             if (image != null) {
                 Log.e("share", "image no null");
                 message.setThumbImage(image);
-            }else {
+            } else {
                 Log.e("share", "image null");
             }
         }
@@ -407,7 +466,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
                 .build();
     }
 
-    private void  _downloadImage(String imageUrl, ResizeOptions resizeOptions, DataSubscriber<CloseableReference<CloseableImage>> dataSubscriber) {
+    private void _downloadImage(String imageUrl, ResizeOptions resizeOptions, DataSubscriber<CloseableReference<CloseableImage>> dataSubscriber) {
 
         Uri uri = null;
         try {
@@ -474,7 +533,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
         }
     }
 
-    private byte[] _Bitmap2Bytes(Bitmap bm){
+    private byte[] _Bitmap2Bytes(Bitmap bm) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bm.compress(Bitmap.CompressFormat.JPEG, 70, baos);
         return baos.toByteArray();
