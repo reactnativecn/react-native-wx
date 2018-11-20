@@ -207,18 +207,17 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
         WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
         req.userName = data.getString("userName");
         req.path = data.getString("path");
-        int type = data.getInt("type");
-        switch (type) {
-            case 1:
-                req.miniprogramType = WXLaunchMiniProgram.Req.MINIPROGRAM_TYPE_TEST;
-                break;
-            case 2:
-                req.miniprogramType = WXLaunchMiniProgram.Req.MINIPROGRAM_TYPE_PREVIEW;
-                break;
-            default:
-                req.miniprogramType = WXLaunchMiniProgram.Req.MINIPTOGRAM_TYPE_RELEASE;
-                break;
-        }
+        req.miniprogramType = WXLaunchMiniProgram.Req.MINIPTOGRAM_TYPE_RELEASE;
+        if (data.hasKey("miniprogramType")) {
+            switch (data.getInt("miniprogramType")) {
+                case 1:
+                    req.miniprogramType = WXLaunchMiniProgram.Req.MINIPROGRAM_TYPE_PREVIEW;
+                    break;
+                case 2:
+                    req.miniprogramType = WXLaunchMiniProgram.Req.MINIPROGRAM_TYPE_PREVIEW;
+                    break;
+            }
+        }        
         callback.invoke(api.sendReq(req) ? null : INVOKE_FAILED);
     }
 
@@ -416,7 +415,14 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
                 }
                 object.miniprogramType = WXMiniProgramObject.MINIPTOGRAM_TYPE_RELEASE;
                 if (data.hasKey(RCTWXShareMiniProType)) {
-                    object.miniprogramType = data.getInt(RCTWXShareMiniProType);
+                    switch (data.getInt(RCTWXShareMiniProType)) {
+                        case 1:
+                            object.miniprogramType = WXMiniProgramObject.MINIPROGRAM_TYPE_TEST;
+                            break;
+                        case 2:
+                            object.miniprogramType = WXMiniProgramObject.MINIPROGRAM_TYPE_PREVIEW;
+                            break;
+                    }
                 }
                 if (data.hasKey(RCTWXShareImageUrl) && image != null) {
                     Bitmap thumb = Bitmap.createScaledBitmap(image, 375, 300, true);

@@ -20,6 +20,7 @@
 #define RCTWXShareTypeText @"text"
 #define RCTWXShareTypeVideo @"video"
 #define RCTWXShareTypeAudio @"audio"
+#define RCTWXShareTypeMiniPro @"miniprogram"
 
 #define RCTWXShareType @"type"
 #define RCTWXShareTitle @"title"
@@ -28,6 +29,9 @@
 #define RCTWXShareWebpageUrl @"webpageUrl"
 #define RCTWXShareImageUrl @"imageUrl"
 #define RCTWXShareThumbImageSize @"thumbImageSize"
+#define RCTWXShareUserName @"userName"
+#define RCTWXSharePath @"path"
+#define RCTWXShareMiniProType @"miniprogramType"
 
 #define NOT_REGISTERED (@"registerApp required.")
 #define INVOKE_FAILED (@"WeChat API invoke returns false.")
@@ -75,7 +79,8 @@ RCT_EXPORT_METHOD(isWXAppInstalled:(RCTResponseSenderBlock)callback)
     callback(@[[NSNull null], @([WXApi isWXAppInstalled])]);
 }
 
-RCT_EXPORT_METHOD(isWXAppSupportApi:(RCTResponseSenderBlock)callback)
+RCT_EXPORT_METHOD(isWXAppSupportApi:(NSString*)type
+                  :(RCTResponseSenderBlock)callback)
 {
     callback(@[[NSNull null], @([WXApi isWXAppSupportApi])]);
 }
@@ -112,6 +117,18 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
     req.timeStamp           = [data[@"timeStamp"] unsignedIntValue];
     req.package             = data[@"package"];
     req.sign                = data[@"sign"];
+    BOOL success = [WXApi sendReq:req];
+    callback(@[success ? [NSNull null] : INVOKE_FAILED]);
+}
+
+RCT_EXPORT_METHOD(launchMiniPro:(NSDictionary *)data
+                  :(RCTResponseSenderBlock)callback)
+{
+    WXLaunchMiniProgramReq *req = [WXLaunchMiniProgramReq object];
+    req.userName = data[@"userName"];
+    req.path = data[@"path"];
+    req.miniProgramType = (WXMiniProgramType)[data[@"miniprogramType"] integerValue];
+    
     BOOL success = [WXApi sendReq:req];
     callback(@[success ? [NSNull null] : INVOKE_FAILED]);
 }
@@ -180,6 +197,18 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
                 videoObject.videoLowBandUrl = aData[@"videoLowBandUrl"];
                 mediaMessage.mediaObject = videoObject;
             }
+            else if ([type isEqualToString:RCTWXShareTypeMiniPro]) {
+                WXMiniProgramObject *wxMiniObject = [WXMiniProgramObject new];
+                wxMiniObject.webpageUrl = aData[@"webpageUrl"];
+                wxMiniObject.userName = aData[@"userName"];
+                wxMiniObject.path = aData[@"path"];
+                wxMiniObject.miniProgramType = (WXMiniProgramType)[aData[@"miniprogramType"] integerValue];
+                if (aImage != nil) {
+                    wxMiniObject.hdImageData = UIImageJPEGRepresentation(aImage, 0.7);
+                }
+                mediaMessage.mediaObject = wxMiniObject;
+                mediaMessage.thumbData = nil;
+            }
         }
         
         req.message = mediaMessage;
@@ -196,11 +225,15 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
     if (imageUrl.length && _bridge.imageLoader) {
         CGSize size = CGSizeZero;
         if (![aData[RCTWXShareType] isEqualToString:RCTWXShareTypeImage]) {
-            CGFloat thumbImageSize = 80;
-            if (aData[RCTWXShareThumbImageSize]) {
-                thumbImageSize = [aData[RCTWXShareThumbImageSize] floatValue];
+            if ([aData[RCTWXShareType] isEqualToString:RCTWXShareTypeMiniPro]) {
+                size = CGSizeMake(375.0f, 300.0f);
+            } else {
+                CGFloat thumbImageSize = 80;
+                if (aData[RCTWXShareThumbImageSize]) {
+                    thumbImageSize = [aData[RCTWXShareThumbImageSize] floatValue];
+                }
+                size = CGSizeMake(thumbImageSize,thumbImageSize);
             }
-            size = CGSizeMake(thumbImageSize,thumbImageSize);
         }
         [_bridge.imageLoader loadImageWithURLRequest:[RCTConvert NSURLRequest:imageUrl] size:size scale:1 clipped:FALSE resizeMode:UIViewContentModeScaleToFill progressBlock:nil partialLoadBlock: nil completionBlock:^(NSError *error, UIImage *image) {
             [self shareToWeixinWithData:aData image:image scene:aScene callBack:aCallBack];
@@ -291,6 +324,11 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
         body[@"appid"] = gAppID;
         body[@"returnKey"] = r.returnKey;
         body[@"type"]= @"Pay.Resp";
+    }
+    else if ([resp isKindOfClass:[WXLaunchMiniProgramResp class]]) {
+        WXLaunchMiniProgramResp *r = (WXLaunchMiniProgramResp *)resp;
+        body[@"extMsg"] = r.extMsg;
+        body[@"type"] = @"WXLaunchMiniProgram.Resp";
     }
     
     [self.bridge.eventDispatcher sendAppEventWithName:@"WeChat_Resp" body:body];
